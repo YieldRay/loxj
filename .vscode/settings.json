@@ -1,0 +1,26 @@
+{
+    "files.associations": {
+        "*.embeddedhtml": "html",
+        "*.ejs": "html",
+        ".env": "dotenv",
+        "compare": "c",
+        "type_traits": "c",
+        "ctype.h": "c",
+        "common.h": "c",
+        "vm.h": "c",
+        "value.h": "c",
+        "object.h": "c",
+        "table.h": "c",
+        "memory.h": "c",
+        "stdbool.h": "c",
+        "stddef.h": "c",
+        "chunk.h": "c",
+        "debug.h": "c",
+        "compiler.h": "c",
+        "typeinfo": "c",
+        "functional": "c",
+        "system_error": "c",
+        "math.h": "c",
+        "unistd.h": "c"
+    }
+}

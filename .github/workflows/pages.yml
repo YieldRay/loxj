@@ -1,0 +1,57 @@
+name: Build
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+    contents: read
+    id-token: write
+    pages: write
+
+# Allow one concurrent deployment
+concurrency:
+    group: "pages"
+    cancel-in-progress: true
+
+jobs:
+    deploy:
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Emscripten
+              uses: mymindstorm/setup-emsdk@v14
+
+            - name: Build with emscripten
+              run: |
+                  emcc src/*.c -o pages/index.js -sEXPORTED_FUNCTIONS=_try_loxj -sEXPORTED_RUNTIME_METHODS=ccall,cwrap
+
+            - name: Build with wasi-sdk
+              run: |
+                  export WASI_VERSION=20
+                  export WASI_VERSION_FULL=${WASI_VERSION}.0
+                  wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_VERSION}/wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz
+                  tar xvf wasi-sdk-${WASI_VERSION_FULL}-linux.tar.gz
+                  export WASI_SDK_PATH=`pwd`/wasi-sdk-${WASI_VERSION_FULL}
+                  CC="${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot"
+                  $CC src/*.c -o pages/loxj-wasi.wasm
+
+            - name: Setup Pages
+              uses: actions/configure-pages@v4
+
+            - name: Upload artifact
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: "./pages"
+
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4
