@@ -312,14 +312,40 @@
             const KEY = "code";
             editor.session.setValue(
                 localStorage.getItem(KEY) ||
-                    `fun fib(n) {
+                    `function fib(n) {
   if (n < 2) return n;
   return fib(n - 2) + fib(n - 1);
 }
 
-var start = clock();
-print fib(22);
-print clock() - start;`
+class Solution {
+  constructor(label) {
+    this.label = label;
+  }
+  measure(cb) {
+    if (typeof cb != "function") {
+      print("cb should be function");
+      exit(-1);
+    }
+    var start = clock();
+    cb();
+    echo(this.label, " took ", clock() - start, "ms", "\n");
+  }
+}
+
+function callFib() {
+  print(fib(24));
+}
+
+Solution("fibonacci").measure(callFib);
+
+function makeClosure() {
+  var a = 0;
+  function inner() {
+    a = a + 1;
+    return a;
+  }
+}
+`
             );
 
             editor.session.on("change", function (delta) {
