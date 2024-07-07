@@ -20,7 +20,7 @@ __declspec(dllimport) void __stdcall Sleep(unsigned long dwMilliseconds);
 #include <stdlib.h>
 #include <math.h>
 static Value sleepNative(int argCount, Value *args)
-{ // sleep(ms)
+{
     if (argCount >= 1 && IS_NUMBER(args[0]))
     {
         double seconds = AS_NUMBER(args[0]);

@@ -70,7 +70,18 @@ lox 是 C 风格的动态类型语言，支持闭包、基于类的面向对象�
 <DIGIT>          ::= "0" ... "9"
 ```
 
-## 编译为 WASM
+# 编译
+
+| 宏                  | 描述                              |
+| ------------------- | --------------------------------- |
+| LOXJ_OPTIONS_ESCAPE | 启用字符串字面量转义              |
+| LOXJ_OPTIONS_SLEEP  | 启用跨平台内置函数 sleep(seconds) |
+
+```
+$ make
+```
+
+下面仅说明 WASM 编译目标。
 
 ## [emscripten](https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html)
 
