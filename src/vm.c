@@ -469,6 +469,20 @@ static InterpretResult run()
     } while (false)
     // 此宏使用 do{}while(false)，允许后接分号
 
+// CONVERT_TYPE： int32_t 或 uint32_t
+#define BINARY_BITWISE_OP(CONVERT_TYPE, OP)              \
+    do                                                   \
+    {                                                    \
+        if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1)))  \
+        {                                                \
+            runtimeError("Operands must be numbers.");   \
+            return INTERPRET_RUNTIME_ERROR;              \
+        }                                                \
+        CONVERT_TYPE b = (CONVERT_TYPE)AS_NUMBER(pop()); \
+        CONVERT_TYPE a = (CONVERT_TYPE)AS_NUMBER(pop()); \
+        push(NUMBER_VAL((double)(a OP b)));              \
+    } while (false)
+
     // 字节码分派
     for (;;)
     {
@@ -628,6 +642,35 @@ static InterpretResult run()
             }
             push(NUMBER_VAL(-AS_NUMBER(pop())));
             break;
+        case OP_BITWISE_NOT:
+            if (!IS_NUMBER(peek(0)))
+            {
+                runtimeError("Operand must be a number.");
+                return INTERPRET_RUNTIME_ERROR;
+            }
+            push(NUMBER_VAL((double)~((int32_t)AS_NUMBER(pop()))));
+            break;
+        case OP_BITWISE_XOR:
+            BINARY_BITWISE_OP(int32_t, ^);
+            break;
+        case OP_BITWISE_AND:
+            BINARY_BITWISE_OP(int32_t, &);
+            break;
+        case OP_BITWISE_OR:
+            BINARY_BITWISE_OP(int32_t, |);
+            break;
+        case OP_LEFT_SHIFT:
+            BINARY_BITWISE_OP(int32_t, <<);
+            break;
+        case OP_RIGHT_SHIFT:
+            BINARY_BITWISE_OP(int32_t, >>);
+            break;
+        case OP_UNSIGNED_LEFT_SHIFT:
+            BINARY_BITWISE_OP(int32_t, <<);
+            break;
+        case OP_UNSIGNED_RIGHT_SHIFT:
+            BINARY_BITWISE_OP(uint32_t, >>);
+            break;
         case OP_PRINT:
             printValue(pop());
             putchar('\n');
@@ -786,7 +829,7 @@ static InterpretResult run()
         case OP_TYPEOF:
         {
             Value value = pop();
-            const char *t = typeofValue(value);
+            const char *t = typeofValue(value); // 常量字符串，无需管理 GC
             ObjString *s = copyString(t, strlen(t));
             push(OBJ_VAL(s));
             break;
@@ -800,6 +843,7 @@ static InterpretResult run()
 #undef READ_STRING
 #undef READ_SHORT
 #undef BINARY_OP
+#undef BINARY_BITWISE_OP
 }
 
 InterpretResult interpret(const char *sourceCode)

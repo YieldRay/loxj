@@ -13,6 +13,9 @@
 // TODO
 // https://github.com/munificent/craftinginterpreters/blob/master/note/answers/chapter23_jumping/1.md
 
+// TODO
+// 更好的IEEE754支持，包括 +-Infinity
+
 typedef struct
 {
     /** 指向当前词素起点 */
@@ -421,16 +424,33 @@ Token scanToken()
     case '=':
         return makeToken(match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
     case '<':
-        return makeToken(match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
+    {
+        if (match('='))
+            return makeToken(TOKEN_LESS_EQUAL);
+        else if (match('<'))
+            return makeToken(match('<') ? TOKEN_UNSIGNED_LEFT_SHIFT : TOKEN_LEFT_SHIFT);
+        else
+            return makeToken(TOKEN_LESS);
+    }
     case '>':
-        return makeToken(match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+    {
+        if (match('='))
+            return makeToken(TOKEN_GREATER_EQUAL);
+        else if (match('>'))
+            return makeToken(match('>') ? TOKEN_UNSIGNED_RIGHT_SHIFT : TOKEN_RIGHT_SHIFT);
+        else
+            return makeToken(TOKEN_LESS);
+    }
     case '"':
         return stringToken();
-    // TODO：添加位运算支持
     case '&':
-        return makeToken(match('&') ? TOKEN_AND : TOKEN_AND);
+        return makeToken(match('&') ? TOKEN_AND : TOKEN_BITWISE_AND);
     case '|':
-        return makeToken(match('|') ? TOKEN_AND : TOKEN_AND);
+        return makeToken(match('|') ? TOKEN_OR : TOKEN_BITWISE_OR);
+    case '~':
+        return makeToken(TOKEN_BITWISE_NOT);
+    case '^':
+        return makeToken(TOKEN_BITWISE_XOR);
     }
 
     return errorToken("Unexpected character.");

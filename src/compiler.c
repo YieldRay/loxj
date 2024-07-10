@@ -26,15 +26,19 @@ typedef struct
 typedef enum
 {
     PREC_NONE,
-    PREC_ASSIGNMENT, // =
-    PREC_OR,         // or
-    PREC_AND,        // and
-    PREC_EQUALITY,   // == !=
-    PREC_COMPARISON, // < > <= >=
-    PREC_TERM,       // + -
-    PREC_FACTOR,     // * /
-    PREC_UNARY,      // ! -
-    PREC_CALL,       // . ()
+    PREC_ASSIGNMENT,  // =
+    PREC_LOGICAL_OR,  // ||
+    PREC_LOGICAL_AND, // &&
+    PREC_BITWISE_OR,  // |
+    PREC_BITWISE_XOR, // ^
+    PREC_BITWISE_AND, // &
+    PREC_EQUALITY,    // == !=
+    PREC_COMPARISON,  // < > <= >=
+    PREC_SHIFT,       // << >> >>>
+    PREC_TERM,        // + -
+    PREC_FACTOR,      // * /
+    PREC_UNARY,       // ! - ~ typeof
+    PREC_CALL,        // . ()
     PREC_PRIMARY
 } Precedence;
 
@@ -79,6 +83,16 @@ ParseRule const rules[] = {
     [TOKEN_SEMICOLON] = {NULL, NULL, PREC_NONE},
     [TOKEN_SLASH] = {NULL, binary, PREC_FACTOR},
     [TOKEN_STAR] = {NULL, binary, PREC_FACTOR},
+
+    [TOKEN_BITWISE_NOT] = {unary, NULL, PREC_NONE},
+    [TOKEN_BITWISE_XOR] = {NULL, binary, PREC_BITWISE_XOR},
+    [TOKEN_BITWISE_AND] = {NULL, binary, PREC_BITWISE_AND},
+    [TOKEN_BITWISE_OR] = {NULL, binary, PREC_BITWISE_OR},
+    [TOKEN_LEFT_SHIFT] = {NULL, binary, PREC_SHIFT},
+    [TOKEN_UNSIGNED_LEFT_SHIFT] = {NULL, binary, PREC_SHIFT},
+    [TOKEN_RIGHT_SHIFT] = {NULL, binary, PREC_SHIFT},
+    [TOKEN_UNSIGNED_RIGHT_SHIFT] = {NULL, binary, PREC_SHIFT},
+
     [TOKEN_BANG] = {unary, NULL, PREC_NONE},
     [TOKEN_BANG_EQUAL] = {NULL, binary, PREC_EQUALITY},
     [TOKEN_EQUAL] = {NULL, NULL, PREC_NONE},
@@ -90,18 +104,18 @@ ParseRule const rules[] = {
     [TOKEN_IDENTIFIER] = {variable, NULL, PREC_NONE},
     [TOKEN_STRING] = {string, NULL, PREC_NONE},
     [TOKEN_NUMBER] = {number, NULL, PREC_NONE},
-    [TOKEN_AND] = {NULL, and_, PREC_AND},
+    [TOKEN_AND] = {NULL, and_, PREC_LOGICAL_AND},
     [TOKEN_CLASS] = {NULL, NULL, PREC_NONE},
     [TOKEN_EXTENDS] = {NULL, binary, PREC_COMPARISON}, // same as TOKEN_LESS
-    [TOKEN_TYPEOF] = {unary, NULL, PREC_COMPARISON},   // typeof
     [TOKEN_ELSE] = {NULL, NULL, PREC_NONE},
     [TOKEN_FALSE] = {literal, NULL, PREC_NONE},
     [TOKEN_FOR] = {NULL, NULL, PREC_NONE},
     [TOKEN_FUN] = {NULL, NULL, PREC_NONE},
     [TOKEN_IF] = {NULL, NULL, PREC_NONE},
     [TOKEN_NIL] = {literal, NULL, PREC_NONE},
-    [TOKEN_OR] = {NULL, or_, PREC_OR},
+    [TOKEN_OR] = {NULL, or_, PREC_LOGICAL_OR},
     [TOKEN_PRINT] = {NULL, NULL, PREC_NONE},
+    [TOKEN_TYPEOF] = {unary, NULL, PREC_UNARY}, // typeof
     [TOKEN_RETURN] = {NULL, NULL, PREC_NONE},
     [TOKEN_SUPER] = {super_, NULL, PREC_NONE},
     [TOKEN_THIS] = {this_, NULL, PREC_NONE},
@@ -1143,9 +1157,13 @@ static void unary(bool canAssign)
     case TOKEN_TYPEOF:
         emitByte(OP_TYPEOF);
         break;
-
+    case TOKEN_BITWISE_NOT:
+        emitByte(OP_BITWISE_NOT);
+        break;
     default:
-        return; // 不可达
+        // 不可达
+        error("Unimplemented unary operator.");
+        return;
     }
 }
 
@@ -1163,7 +1181,6 @@ static void binary(bool canAssign)
     case TOKEN_PLUS:
         emitByte(OP_ADD);
         break;
-
     case TOKEN_MINUS:
         emitByte(OP_SUBTRACT);
         break;
@@ -1194,8 +1211,31 @@ static void binary(bool canAssign)
         emitByte(OP_GREATER);
         emitByte(OP_NOT);
         break;
+    case TOKEN_BITWISE_XOR:
+        emitByte(OP_BITWISE_XOR);
+        break;
+    case TOKEN_BITWISE_AND:
+        emitByte(OP_BITWISE_AND);
+        break;
+    case TOKEN_BITWISE_OR:
+        emitByte(OP_BITWISE_OR);
+        break;
+    case TOKEN_LEFT_SHIFT:
+        emitByte(OP_LEFT_SHIFT);
+        break;
+    case TOKEN_RIGHT_SHIFT:
+        emitByte(OP_RIGHT_SHIFT);
+        break;
+    case TOKEN_UNSIGNED_LEFT_SHIFT:
+        emitByte(OP_UNSIGNED_LEFT_SHIFT);
+        break;
+    case TOKEN_UNSIGNED_RIGHT_SHIFT:
+        emitByte(OP_UNSIGNED_RIGHT_SHIFT);
+        break;
     default:
-        return; // 不可达
+        // 不可达
+        error("Unimplemented binary operator.");
+        return;
     }
 }
 
@@ -1204,7 +1244,7 @@ static void and_(bool canAssign)
     int endJump = emitJump(OP_JUMP_IF_FALSE);
 
     emitByte(OP_POP);
-    parsePrecedence(PREC_AND);
+    parsePrecedence(PREC_LOGICAL_AND);
 
     patchJump(endJump);
     /*
@@ -1224,7 +1264,7 @@ static void or_(bool canAssign)
     patchJump(elseJump);
     emitByte(OP_POP);
 
-    parsePrecedence(PREC_OR);
+    parsePrecedence(PREC_LOGICAL_OR);
     patchJump(endJump);
     /* TODO：需要3条指令，优化为2条
 left-expression

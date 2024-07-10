@@ -29,15 +29,23 @@ typedef enum
     TOKEN_STRING,
     TOKEN_NUMBER,
     // Keywords
-    TOKEN_AND,
     TOKEN_CLASS,
     TOKEN_ELSE,
     TOKEN_FALSE,
     TOKEN_FOR,
     TOKEN_FUN,
     TOKEN_IF,
-    TOKEN_NIL,
+    TOKEN_AND,
     TOKEN_OR,
+    TOKEN_NIL,
+    TOKEN_BITWISE_AND,          // &
+    TOKEN_BITWISE_OR,           // |
+    TOKEN_BITWISE_XOR,          // ^
+    TOKEN_BITWISE_NOT,          // ~
+    TOKEN_LEFT_SHIFT,           // <<
+    TOKEN_UNSIGNED_LEFT_SHIFT,  // <<<
+    TOKEN_RIGHT_SHIFT,          // >>
+    TOKEN_UNSIGNED_RIGHT_SHIFT, // >>>
     TOKEN_PRINT,
     TOKEN_RETURN,
     TOKEN_SUPER,

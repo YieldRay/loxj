@@ -136,6 +136,22 @@ int disassembleInstruction(Chunk *chunk, int offset)
         return simpleInstruction("OP_DIVIDE", offset);
     case OP_NOT:
         return simpleInstruction("OP_NOT", offset);
+    case OP_BITWISE_NOT:
+        return simpleInstruction("OP_BITWISE_NOT", offset);
+    case OP_BITWISE_XOR:
+        return simpleInstruction("OP_BITWISE_XOR", offset);
+    case OP_BITWISE_AND:
+        return simpleInstruction("OP_BITWISE_AND", offset);
+    case OP_BITWISE_OR:
+        return simpleInstruction("OP_BITWISE_OR", offset);
+    case OP_LEFT_SHIFT:
+        return simpleInstruction("OP_LEFT_SHIFT", offset);
+    case OP_RIGHT_SHIFT:
+        return simpleInstruction("OP_RIGHT_SHIFT", offset);
+    case OP_UNSIGNED_LEFT_SHIFT:
+        return simpleInstruction("OP_UNSIGNED_LEFT_SHIFT", offset);
+    case OP_UNSIGNED_RIGHT_SHIFT:
+        return simpleInstruction("OP_UNSIGNED_RIGHT_SHIFT", offset);
     case OP_NEGATE:
         return simpleInstruction("OP_NEGATE", offset);
     case OP_PRINT:

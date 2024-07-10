@@ -37,6 +37,15 @@ typedef enum
     OP_DIVIDE,
     OP_NOT,
     OP_NEGATE,
+    // bitwise
+    OP_BITWISE_NOT,
+    OP_BITWISE_XOR,
+    OP_BITWISE_AND,
+    OP_BITWISE_OR,
+    OP_LEFT_SHIFT,
+    OP_RIGHT_SHIFT,
+    OP_UNSIGNED_LEFT_SHIFT,
+    OP_UNSIGNED_RIGHT_SHIFT,
     // func
     OP_PRINT,
     OP_CALL,
