@@ -38,6 +38,7 @@ typedef enum
     TOKEN_AND,
     TOKEN_OR,
     TOKEN_NIL,
+    TOKEN_REMAINDER,            // %
     TOKEN_BITWISE_AND,          // &
     TOKEN_BITWISE_OR,           // |
     TOKEN_BITWISE_XOR,          // ^

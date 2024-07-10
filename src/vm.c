@@ -650,6 +650,9 @@ static InterpretResult run()
             }
             push(NUMBER_VAL((double)~((int32_t)AS_NUMBER(pop()))));
             break;
+        case OP_REMAINDER:
+            BINARY_BITWISE_OP(int32_t, %);
+            break;
         case OP_BITWISE_XOR:
             BINARY_BITWISE_OP(int32_t, ^);
             break;
@@ -666,7 +669,7 @@ static InterpretResult run()
             BINARY_BITWISE_OP(int32_t, >>);
             break;
         case OP_UNSIGNED_LEFT_SHIFT:
-            BINARY_BITWISE_OP(int32_t, <<);
+            BINARY_BITWISE_OP(uint32_t, <<);
             break;
         case OP_UNSIGNED_RIGHT_SHIFT:
             BINARY_BITWISE_OP(uint32_t, >>);

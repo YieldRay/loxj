@@ -15,6 +15,7 @@
 
 // TODO
 // 更好的IEEE754支持，包括 +-Infinity
+// 实现 i++ i-- 操作符
 
 typedef struct
 {
@@ -431,6 +432,9 @@ Token scanToken()
             return makeToken(match('<') ? TOKEN_UNSIGNED_LEFT_SHIFT : TOKEN_LEFT_SHIFT);
         else
             return makeToken(TOKEN_LESS);
+        // 注意：我们这里添加了 <<< 无符号左移操作符
+        // 虽然这是无意义的，因为 << 和 <<< 没有任何区别
+        // 实现它只是为了对称
     }
     case '>':
     {
@@ -451,8 +455,9 @@ Token scanToken()
         return makeToken(TOKEN_BITWISE_NOT);
     case '^':
         return makeToken(TOKEN_BITWISE_XOR);
+    case '%':
+        return makeToken(TOKEN_REMAINDER);
     }
-
     return errorToken("Unexpected character.");
 }
 

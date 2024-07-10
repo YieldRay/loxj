@@ -37,6 +37,7 @@ typedef enum
     OP_DIVIDE,
     OP_NOT,
     OP_NEGATE,
+    OP_REMAINDER,
     // bitwise
     OP_BITWISE_NOT,
     OP_BITWISE_XOR,

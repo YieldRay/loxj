@@ -36,7 +36,7 @@ typedef enum
     PREC_COMPARISON,  // < > <= >=
     PREC_SHIFT,       // << >> >>>
     PREC_TERM,        // + -
-    PREC_FACTOR,      // * /
+    PREC_FACTOR,      // * / %
     PREC_UNARY,       // ! - ~ typeof
     PREC_CALL,        // . ()
     PREC_PRIMARY
@@ -83,6 +83,7 @@ ParseRule const rules[] = {
     [TOKEN_SEMICOLON] = {NULL, NULL, PREC_NONE},
     [TOKEN_SLASH] = {NULL, binary, PREC_FACTOR},
     [TOKEN_STAR] = {NULL, binary, PREC_FACTOR},
+    [TOKEN_REMAINDER] = {NULL, binary, PREC_FACTOR},
 
     [TOKEN_BITWISE_NOT] = {unary, NULL, PREC_NONE},
     [TOKEN_BITWISE_XOR] = {NULL, binary, PREC_BITWISE_XOR},
@@ -1189,6 +1190,9 @@ static void binary(bool canAssign)
         break;
     case TOKEN_SLASH:
         emitByte(OP_DIVIDE);
+        break;
+    case TOKEN_REMAINDER:
+        emitByte(OP_REMAINDER);
         break;
     case TOKEN_BANG_EQUAL:
         emitByte(OP_EQUAL);
