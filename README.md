@@ -120,3 +120,5 @@ JavaScript 环境，如 [Node.js](https://nodejs.org/api/wasi.html)/Bun/[Deno](h
 # Others
 
 For a real scripting language, you may prefer [wren-lang](https://github.com/wren-lang/wren).
+
+For those who care more about JavaScript, you may prefer [quickjs](https://github.com/bellard/quickjs/blob/master/quickjs.c).
